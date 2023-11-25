@@ -1,0 +1,35 @@
+name: Deploy para AWS S3
+
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout codigo
+      uses: actions/checkout@v2
+
+    - name: Configurar ambiente phyton
+      uses: actions/setup-phyton@v3
+      with:
+        phyton-version: '3.x'
+
+    - name: Instalar Dependencias
+      run: pip install -r requirements.txt
+
+    - name: Validar Sintaxe do Phyton 
+      run: phyton -m py_compile app.py
+    
+    - name: Configurar credenciais da AWS
+      run: 
+        aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_KEY }}
+        aws configure set region us-east-1 ${{ secrets.AWS_ACCESS_KEY_ID }}
+
+    - name: Copiar para o S3
+      run: aws s3 cp app.py s3://mack-exercicio6/
+
+      
